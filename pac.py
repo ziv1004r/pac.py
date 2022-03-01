@@ -24,17 +24,21 @@ pac_x_step = 10
 x_step = 10
 play = True
 
+y_step = 10
 
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface = myfont.render('Score:', True, (255, 255, 255))
 screen.blit(textsurface,(10,20))
-
-
+vector1 = False
+vector2 = False
+vector3 = False
+vector4 = False
 
 
 while play:
   screen.blit(bk,(0,0))
   screen.blit(pac,(pac_x,pac_y))
+
   # pygame.draw.rect(screen,(24,116,205),((20,15),(1300,15)))
   # pygame.draw.rect(screen,(24,116,205),((20,480),(1300,480)))
 
@@ -50,15 +54,19 @@ while play:
   
   # pygame.draw.rect(screen,(24,116,205),((250,100),(70,250)))
   # pygame.draw.rect(screen,(24,116,205),((1000,100),(70,250)))
-
-  event = 0
-  num = 0
-  if event.key == pygame.K_LEFT:
-    event = 1
-  if event.key == pygame.K_LEFT:
-    event = 2
- 
-
+  keys = pygame.key.get_pressed()
+  if keys[pygame.K_LEFT]:
+    pac_x -= x_step
+  if keys[pygame.K_RIGHT]:
+    pac_x += x_step
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+      play = False
+    elif event.type == pygame.KEYDOWN:
+      if event.key == pygame.K_LEFT:
+        pac_x -= x_step
+      if event.key == pygame.K_RIGHT:
+        pac_x += x_step
   pygame.display.flip()
 
 
