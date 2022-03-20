@@ -2,7 +2,7 @@ from ast import If
 from turtle import color
 import pygame
  
-WINDOW_W = 1336
+WINDOW_W = 1300
 WINDOW_H = 500
 WINDOW_SIZE = (WINDOW_W, WINDOW_H)
 score = 0
@@ -40,50 +40,59 @@ vector4 = False
 while play:
   screen.blit(bk,(0,0))
   screen.blit(pac,(pac_x,pac_y))
-  color = screen.get_at((int(pac_x+ 15),int(pac_y - 4)))
-  print(color)
-  # pygame.draw.rect(screen,(24,116,205),((20,15),(1300,15)))
-  # pygame.draw.rect(screen,(24,116,205),((20,480),(1300,480)))
-
-  # pygame.draw.rect(screen,(24,116,205),((20,15),(20,200)))
-  # pygame.draw.rect(screen,(24,116,205),((1315,15),(1315,200)))
-  # pygame.draw.rect(screen,(24,116,205),((1315,270),(1315,480)))
-  # pygame.draw.rect(screen,(24,116,205),((20,270),(20,480)))
-  
-  # pygame.draw.rect(screen,(24,116,205),((20,200),(150,20)))
-  # pygame.draw.rect(screen,(24,116,205),((20,270),(150,20)))
-  # pygame.draw.rect(screen,(24,116,205),((1165,270),(150,20)))
-  # pygame.draw.rect(screen,(24,116,205),((1165,195),(150,20)))
-  
-  # pygame.draw.rect(screen,(24,116,205),((250,100),(70,250)))
-  # pygame.draw.rect(screen,(24,116,205),((1000,100),(70,250)))
+  color_left = screen.get_at((int(pac_x),int(pac_y + 15)))
+  color_right = screen.get_at((int(pac_x + 30),int(pac_y + 15)))
+  color_top = screen.get_at((int(pac_x + 15),int(pac_y)))
+  color_under = screen.get_at((int(pac_x + 15),int(pac_y - 32)))
   keys = pygame.key.get_pressed()
   if keys[pygame.K_LEFT]:
-    if color == (0,0,1,255):
+    if color_left == (0,0,1,255):
       pac_x -= x_step
+    else:
+      print('The color is not black here')
+
   if keys[pygame.K_RIGHT]:
-    pac_x += x_step
+    if color_right == (0,0,1,255):
+      pac_x += x_step
+
   if keys[pygame.K_UP]:
-    pac_y -= y_step
+    if color_top == (0,0,1,255):
+      pac_y -= y_step  
+
   if keys[pygame.K_DOWN]:
-    pac_y += y_step
+    if color_under == (0,0,1,255):
+      pac_y += y_step 
+
+
+
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       play = False
     elif event.type == pygame.KEYDOWN:
       if event.key == pygame.K_LEFT:
-        if color == (0,0,1,255):
+
+        if color_left == (0,0,1,255):
           pac_x -= x_step
+        else:
+          print('The color is not black here')
+
       if event.key == pygame.K_RIGHT:
-        pac_x += x_step
+        if color_right == (0,0,1,255):
+          pac_x += x_step
+
       if event.key == pygame.K_UP:
-        pac_y -= y_step
+        if color_top == (0,0,1,255):
+          pac_y -= y_step
+
       if event.key == pygame.K_DOWN:
-        pac_y += y_step
-  if pac_x < 0:
-    pac_x += WINDOW_W
-  if pac_x > WINDOW_W:
-    pac_x -= WINDOW_W
+        if color_under == (0,0,1,255):
+          pac_y += y_step 
+
+
+  if pac_x <= 30:
+    pac_x = WINDOW_W - 30
+  if pac_x > WINDOW_W - 30:
+    pac_x = + 30
   pygame.display.flip()
 
 
