@@ -25,6 +25,9 @@ enemy1 = pygame.transform.scale(enemy1,(30,30))
 candy_pick = pygame.image.load("candy.png")
 candy_pick = pygame.transform.scale(candy_pick,(15,15))
 
+over = pygame.image.load("game-over.jpg")
+over = pygame.transform.scale(bk,(WINDOW_W,WINDOW_H))
+
 clock = pygame.time.Clock()
 
 #x and y
@@ -41,14 +44,19 @@ enemy1_y = WINDOW_H / 2 -66
 #score
 score = 0
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
-textsurface = myfont.render('Score:' + str(score), True, (255, 255, 0))
+textsurface = myfont.render('Score P:' + str(score), True, (255, 255, 0))
 
+#score1
+score1 = 0
+myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
+textsurface1 = myfont.render('Score E:' + str(score), True, (202,225,255))
 
 play = True
 while play:
   #blit
   screen.blit(bk,(0,0))
   screen.blit(textsurface,(10,20))
+  screen.blit(textsurface1,(1100,20))
   screen.blit(pac,(pac_x,pac_y))
   screen.blit(enemy1,(enemy1_x,enemy1_y))
   #print candy
@@ -80,6 +88,9 @@ while play:
   if keys[pygame.K_a]:
     if color_left_ene and color_left_top_ene and color_left_under_ene == (0,0,0,255):
       enemy1_x -= x_step
+    elif color_left_ene and color_left_top_ene and color_left_under_ene == (244, 238, 66, 255):
+      play = False
+
 
   if keys[pygame.K_d]:
     if color_right_top_ene and color_right_under_ene and color_right_ene == (0,0,0,255):
@@ -121,6 +132,8 @@ while play:
       if event.key == pygame.K_a:
         if color_left_ene and color_left_top_ene and color_left_under_ene == (0,0,0,255):
           enemy1_x -= x_step
+        elif color_left_ene and color_left_top_ene and color_left_under_ene == (244, 238, 66, 255):
+          play = False
 
       if event.key == pygame.K_d:
         if color_right_top_ene and color_right_under_ene and color_right_ene == (0,0,0,255):
@@ -275,5 +288,4 @@ while play:
 
 
   clock.tick(10)
-
 pygame.quit()
