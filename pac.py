@@ -51,9 +51,12 @@ score1 = 0
 myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface1 = myfont.render('Score E:' + str(score), True, (202,225,255))
 
+
+
+      
 play = True
 while play:
-  #blit
+  #blit 
   screen.blit(bk,(0,0))
   screen.blit(textsurface,(10,20))
   screen.blit(textsurface1,(1100,20))
