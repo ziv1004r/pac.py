@@ -1,13 +1,29 @@
 from ast import If
 from calendar import c
+from tkinter.tix import IMAGE
 from turtle import color
+from winsound import PlaySound
 import pygame
- 
+import time
+import cv2
+import mediapipe as mp
+import cv
+
 #basic for game
 WINDOW_W = 1300
 WINDOW_H = 500
 WINDOW_SIZE = (WINDOW_W, WINDOW_H)
 pygame.init()
+
+#ai
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
+mp_hands = mp.solutions.hands
+
+mp_Hands = mp.solutions.hands
+hands = mp_Hands.Hands()
+mpDraw = mp.solutions.drawing_utils
+cap = cv2.VideoCapture(0)
 
 #basic
 screen = pygame.display.set_mode(WINDOW_SIZE)
@@ -22,6 +38,7 @@ pac = pygame.transform.scale(pac,(30,30))
 enemy1 = pygame.image.load("enemypac.png")
 enemy1 = pygame.transform.scale(enemy1,(30,30))
 
+  
 candy_pick = pygame.image.load("candy.png")
 candy_pick = pygame.transform.scale(candy_pick,(15,15))
 
@@ -51,23 +68,37 @@ score1 = 0
 myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface1 = myfont.render('Score E:' + str(score), True, (202,225,255))
 
-
-
+IMAGE_FILES = []
       
 play = True
 while play:
+  ret,image = cap.read()
+  RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+  cv2.imshow('Original ziv Video',image)
+  if cv2.waitKey(1) & 0xFF == ord('q'):
+    break
+  
   #blit 
   screen.blit(bk,(0,0))
   screen.blit(textsurface,(10,20))
   screen.blit(textsurface1,(1100,20))
   screen.blit(pac,(pac_x,pac_y))
   screen.blit(enemy1,(enemy1_x,enemy1_y))
+  RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+  results = hands.process(RGB_image)
+  multiLandMarks = results.multi_hand_landmarks
+  if multiLandMarks:
+    # go over all hands found and draw them on the BGR image
+    for handLms in multiLandMarks:
+      mpDraw.draw_landmarks(image, handLms, mp_Hands.HAND_CONNECTIONS)
+  
   #print candy
   for candy in range(5):
    screen.blit(candy_pick,(candy_x,candy_y)) 
    candy_x += 10
 
- 
+
+  
 #color enemy
   #color left
   color_left_ene = screen.get_at((int(enemy1_x),int(enemy1_y + 15)))
@@ -98,17 +129,23 @@ while play:
   if keys[pygame.K_d]:
     if color_right_top_ene and color_right_under_ene and color_right_ene == (0,0,0,255):
       enemy1_x += x_step
+    elif color_right_top_ene and color_right_under_ene and color_right_ene == (244, 238, 66, 255):
+      play = False
 
   if keys[pygame.K_w]:
     if color_top_ene and color_top_left_ene and color_top_right_ene == (0,0,0,255):
       enemy1_y -= y_step  
+    elif color_top_ene and color_top_left_ene and color_top_right_ene == (244, 238, 66, 255):
+      play = False
+
 
   if keys[pygame.K_s]:
     if color_under_ene and color_under_left_ene and color_under_right_ene == (0,0,0,255):
       enemy1_y += y_step 
     elif color_under_ene or color_under_right_ene or color_under_left_ene == (9, 0, 255, 255):
       pass
-
+    elif color_under_ene or color_under_right_ene or color_under_left_ene == (244, 238, 66, 255):
+      play = False
 
 
   for event in pygame.event.get():
@@ -141,16 +178,22 @@ while play:
       if event.key == pygame.K_d:
         if color_right_top_ene and color_right_under_ene and color_right_ene == (0,0,0,255):
           enemy1_x += x_step
+        elif color_right_top_ene and color_right_under_ene and color_right_ene == (244, 238, 66, 255):
+          play = False
 
       if event.key == pygame.K_w:
         if color_top_ene and color_top_left_ene and color_top_right_ene == (0,0,0,255):
           enemy1_y -= y_step
+        elif color_top_ene and color_top_left_ene and color_top_right_ene == (244, 238, 66, 255):
+          play = False
 
       if event.key == pygame.K_s:
         if color_under_ene and color_under_left_ene and color_under_right_ene == (0,0,0,255):
           enemy1_y += y_step 
         elif color_under_ene or color_under_right_ene or color_under_left_ene == (9, 0, 255, 255):
           pass
+        elif color_under_ene or color_under_right_ene or color_under_left_ene == (244, 238, 66, 255):
+          play = False
 
  
 
@@ -289,6 +332,7 @@ while play:
     pac_x = 30
   pygame.display.flip()
 
-
+  cap.release()
   clock.tick(10)
 pygame.quit()
+
