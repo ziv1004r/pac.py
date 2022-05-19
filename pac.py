@@ -68,15 +68,66 @@ score1 = 0
 myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface1 = myfont.render('Score E:' + str(score), True, (202,225,255))
 
-IMAGE_FILES = []
-      
+IMAGE_FILES = []    
+
 play = True
 while play:
-  ret,image = cap.read()
+  success, image = cap.read()
   RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-  cv2.imshow('Original ziv Video',image)
+  if not success:
+    print("Ignoring empty camera frame.")
+     # If loading a video, use 'break' instead of 'continue'.
+    continue
+  results = hands.process(RGB_image)
+  multiLandMarks = results.multi_hand_landmarks
+    # To improve performance, optionally mark the image as not writeable to
+    # pass by reference.
+  image.flags.writeable = False
+  image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+  results = hands.process(image)
+
+    # Draw the hand annotations on the image.
+  image.flags.writeable = True
+  image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+  if results.multi_hand_landmarks:
+    for hand_landmarks in results.multi_hand_landmarks:
+      mp_drawing.draw_landmarks(
+      image,
+      hand_landmarks,
+      mp_hands.HAND_CONNECTIONS,
+      mp_drawing_styles.get_default_hand_landmarks_style(),
+      mp_drawing_styles.get_default_hand_connections_style())
+    # Flip the image horizontally for a selfie-view display.
+  cv2.imshow('MediaPipe Hands', cv2.flip(image, 1))
+  cv2.waitKey(30) & 0xff
+  k=cv2.waitKey(30) & 0xff
+  if k==27:
+    break
   if cv2.waitKey(1) & 0xFF == ord('q'):
     break
+
+  results = hands.process(RGB_image)
+  multiLandMarks = results.multi_hand_landmarks
+
+  if multiLandMarks:
+    # go over all hands found and draw them on the BGR image
+    for handLms in multiLandMarks:
+      mpDraw.draw_landmarks(image, handLms, mp_Hands.HAND_CONNECTIONS)
+    
+      index_finger_x8 = multiLandMarks[0].landmark[8].x
+      index_finger_x6 = multiLandMarks[0].landmark[6].x
+      index_finger_x20 = multiLandMarks[0].landmark[20].x
+      index_finger_x17 = multiLandMarks[0].landmark[17].x
+      if index_finger_x8 >= index_finger_x6 and index_finger_x20 <= index_finger_x17 :
+        print("open")
+      else:
+        print("close")
+  cap.release()
+  # ret,image = cap.read()
+  # RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+  # cv2.imshow('Original ziv Video',image)
+  # if cv2.waitKey(1) & 0xFF == ord('q'):
+  #   break
   
   #blit 
   screen.blit(bk,(0,0))
@@ -84,13 +135,14 @@ while play:
   screen.blit(textsurface1,(1100,20))
   screen.blit(pac,(pac_x,pac_y))
   screen.blit(enemy1,(enemy1_x,enemy1_y))
-  RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-  results = hands.process(RGB_image)
-  multiLandMarks = results.multi_hand_landmarks
-  if multiLandMarks:
-    # go over all hands found and draw them on the BGR image
-    for handLms in multiLandMarks:
-      mpDraw.draw_landmarks(image, handLms, mp_Hands.HAND_CONNECTIONS)
+
+  # RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+  # results = hands.process(RGB_image)
+  # multiLandMarks = results.multi_hand_landmarks
+  # if multiLandMarks:
+  #   # go over all hands found and draw them on the BGR image
+  #   for handLms in multiLandMarks:
+  #     mpDraw.draw_landmarks(image, handLms, mp_Hands.HAND_CONNECTIONS)
   
   #print candy
   for candy in range(5):
