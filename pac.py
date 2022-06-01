@@ -5,9 +5,8 @@ from turtle import color
 from winsound import PlaySound
 import pygame
 import time
-import cv2
+import cv2 as cv
 import mediapipe as mp
-
 
 #basic for game
 WINDOW_W = 1300
@@ -16,9 +15,9 @@ WINDOW_SIZE = (WINDOW_W, WINDOW_H)
 pygame.init()
 
 #ai
-mp_drawing = mp.solutions.drawing_utils
-mp_drawing_styles = mp.solutions.drawing_styles
-mp_hands = mp.solutions.hands
+mp_Hands = mp.solutions.hands
+hands = mp_Hands.Hands(max_num_hands=2)
+mpDraw = mp.solutions.drawing_utils
 
 #basic
 screen = pygame.display.set_mode(WINDOW_SIZE)
@@ -47,8 +46,8 @@ pac_x = WINDOW_W -585
 pac_y = WINDOW_H - 380
 candy_y = 30
 candy_x = 30
-x_step = 7
-y_step = 7
+x_step = 6
+y_step = 6
 pac_x_step = 15
 enemy1_x = WINDOW_W / 2 
 enemy1_y = WINDOW_H / 2 -66
@@ -65,44 +64,12 @@ textsurface1 = myfont.render('Score E:' + str(score), True, (202,225,255))
 
 IMAGE_FILES = []    
 
+cap = cv.VideoCapture(0)
+
+    
+
 play = True
 while play:
-  if mp_hands :
-    for idx, file in enumerate(IMAGE_FILES):
-      # Read an image, flip it around y-axis for correct handedness output (see
-      # above).
-      image = cv2.flip(cv2.imread(file), 1)
-      # Convert the BGR image to RGB before processing.
-      results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-
-      # Print handedness and draw hand landmarks on the image.
-      print('Handedness:', results.multi_handedness)
-      if not results.multi_hand_landmarks:
-        continue
-      image_height, image_width, _ = image.shape
-      annotated_image = image.copy()
-      for hand_landmarks in results.multi_hand_landmarks:
-        print('hand_landmarks:', hand_landmarks)
-        print(
-            f'Index finger tip coordinates: (',
-            f'{hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x * image_width}, '
-            f'{hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].y * image_height})'
-        )
-        mp_drawing.draw_landmarks(
-            annotated_image,
-            hand_landmarks,
-            mp_hands.HAND_CONNECTIONS,
-            mp_drawing_styles.get_default_hand_landmarks_style(),
-            mp_drawing_styles.get_default_hand_connections_style())
-      cv2.imwrite(
-          '/tmp/annotated_image' + str(idx) + '.png', cv2.flip(annotated_image, 1))
-      # Draw hand world landmarks.
-      if not results.multi_hand_world_landmarks:
-        continue
-      for hand_world_landmarks in results.multi_hand_world_landmarks:
-        mp_drawing.plot_landmarks(
-          hand_world_landmarks, mp_hands.HAND_CONNECTIONS, azimuth=5)
-  
   #blit 
   screen.blit(bk,(0,0))
   screen.blit(textsurface,(10,20))
@@ -110,13 +77,30 @@ while play:
   screen.blit(pac,(pac_x,pac_y))
   screen.blit(enemy1,(enemy1_x,enemy1_y))
 
-  # RGB_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-  # results = hands.process(RGB_image)
-  # multiLandMarks = results.multi_hand_landmarks
-  # if multiLandMarks:
-  #   # go over all hands found and draw them on the BGR image
-  #   for handLms in multiLandMarks:
-  #     mpDraw.draw_landmarks(image, handLms, mp_Hands.HAND_CONNECTIONS)
+  ret, frame = cap.read(0)
+  RGB_image = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
+  results = hands.process(RGB_image)
+  multiLandMarks = results.multi_hand_landmarks
+  
+  if not ret:
+   print("Can't receive frame (stream end?). Exiting ...")
+   break
+  # Our operations on the frame come here
+  gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+  # Display the resulting frame
+  if multiLandMarks:
+    # go over all hands found and draw them on the BGR image
+    index_finger_x = multiLandMarks[0].landmark[12].x
+    index_finger_x9 = multiLandMarks[0].landmark[9].x
+    if index_finger_x < index_finger_x9:
+      cv.putText(frame, 'hagit', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
+    for handLms in multiLandMarks:
+      mpDraw.draw_landmarks(frame, handLms, mp_Hands.HAND_CONNECTIONS)
+    
+      
+  cv.imshow('frame',frame)  
+  if cv.waitKey(1) == ord('q'):
+    break
   
   #print candy
   for candy in range(5):
@@ -126,6 +110,7 @@ while play:
 
   
 #color enemy
+  
   #color left
   color_left_ene = screen.get_at((int(enemy1_x),int(enemy1_y + 15)))
   color_left_top_ene = screen.get_at((int(enemy1_x),int(enemy1_y + 7)))
@@ -142,10 +127,11 @@ while play:
   color_under_ene = screen.get_at((int(enemy1_x + 15),int(enemy1_y + 30)))
   color_under_right_ene = screen.get_at((int(enemy1_x + 22),int(enemy1_y + 30)))
   color_under_left_ene = screen.get_at((int(enemy1_x + 7),int(enemy1_y + 30)))
- 
+    
   #clicks 
   keys = pygame.key.get_pressed()
   if keys[pygame.K_a]:
+        
     if color_left_ene and color_left_top_ene and color_left_under_ene == (0,0,0,255):
       enemy1_x -= x_step
     elif color_left_ene and color_left_top_ene and color_left_under_ene == (244, 238, 66, 255):
@@ -357,8 +343,8 @@ while play:
   if pac_x > WINDOW_W - 30:
     pac_x = 30
   pygame.display.flip()
-
-  cap.release()
-  clock.tick(10)
+cap.release()
+cv.destroyAllWindows()
+clock.tick(10)
 pygame.quit()
 
