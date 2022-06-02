@@ -1,7 +1,7 @@
 from ast import If
 from calendar import c
 from tkinter.tix import IMAGE
-from turtle import color
+from turtle import color, left, right
 from winsound import PlaySound
 import pygame
 import time
@@ -61,21 +61,21 @@ textsurface = myfont.render('Score P:' + str(score), True, (255, 255, 0))
 score1 = 0
 myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface1 = myfont.render('Score E:' + str(score), True, (202,225,255))
-
-IMAGE_FILES = []    
+ 
 
 cap = cv.VideoCapture(0)
 
-    
-
-play = True
-while play:
-  #blit 
+def bilt():
   screen.blit(bk,(0,0))
   screen.blit(textsurface,(10,20))
   screen.blit(textsurface1,(1100,20))
   screen.blit(pac,(pac_x,pac_y))
   screen.blit(enemy1,(enemy1_x,enemy1_y))
+
+play = True
+while play:
+  #blit 
+  bilt()
 
   ret, frame = cap.read(0)
   RGB_image = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
@@ -90,10 +90,50 @@ while play:
   # Display the resulting frame
   if multiLandMarks:
     # go over all hands found and draw them on the BGR image
-    index_finger_x = multiLandMarks[0].landmark[12].x
-    index_finger_x9 = multiLandMarks[0].landmark[9].x
-    if index_finger_x < index_finger_x9:
-      cv.putText(frame, 'hagit', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
+    index_finger_x = multiLandMarks[0].landmark[8].x
+    index_finger_y = multiLandMarks[0].landmark[8].y
+
+    if index_finger_x < 0.25:
+      pac = pygame.image.load("PACLOL right.png")
+      pac = pygame.transform.scale(pac,(30,30))
+      screen.blit(pac,(pac_x,pac_y))
+      if color_right_top and color_right_under and color_right == (0,0,0,255):
+        pac_x += x_step
+        if pac_x > WINDOW_W - 30:
+         pac_x = 30
+      elif color_left and color_left_top and color_left_under == (112, 201, 194, 255):
+        play = False 
+
+    elif index_finger_x > 0.75:
+      pac = pygame.image.load("PACLOL left.png")
+      pac = pygame.transform.scale(pac,(30,30))
+      screen.blit(pac,(pac_x,pac_y))
+      if color_left and color_left_top and color_left_under == (0,0,0,255):
+        pac_x -= x_step
+        if pac_x <= 31:
+          pac_x = 1250
+
+    elif index_finger_x > index_finger_y and index_finger_y < (WINDOW_H//2) :
+      pac = pygame.image.load("PACLOL top.png")
+      pac = pygame.transform.scale(pac,(30,30))
+      cv.putText(frame, 'up', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
+      if color_top and color_top_left and color_top_right == (0,0,0,255):
+        pac_y -= y_step
+        print (index_finger_x)
+      elif color_left and color_left_top and color_left_under == (112, 201, 194, 255):
+        play = False
+
+    elif index_finger_x < index_finger_y :
+      pac = pygame.image.load("PACLOLunder.png")
+      pac = pygame.transform.scale(pac,(30,30))
+      cv.putText(frame, 'down', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
+      if color_under and color_under_left and color_under_right == (0,0,0,255):
+        pac_y += y_step 
+      elif color_under or color_under_right or color_under_left == (9, 0, 255, 255):
+        pass
+      elif color_left and color_left_top and color_left_under == (112, 201, 194, 255):
+        play = False
+
     for handLms in multiLandMarks:
       mpDraw.draw_landmarks(frame, handLms, mp_Hands.HAND_CONNECTIONS)
     
@@ -245,6 +285,7 @@ while play:
     if color_left and color_left_top and color_left_under == (0,0,0,255):
       pac_x -= x_step
     print(color_left)
+
   if keys[pygame.K_RIGHT]:
     pac = pygame.image.load("PACLOL right.png")
     pac = pygame.transform.scale(pac,(30,30))
