@@ -212,6 +212,23 @@ while play:
   if multiLandMarks:
     index_finger_x = multiLandMarks[0].landmark[8].x
     index_finger_y = multiLandMarks[0].landmark[8].y
+    index_finger_y5 = multiLandMarks[0].landmark[5].y
+    close1 = index_finger_y < index_finger_y5 
+
+    index_finger_y12 = multiLandMarks[0].landmark[12].y
+    index_finger_y9 = multiLandMarks[0].landmark[9].y
+    close2 = index_finger_y12 > index_finger_y9
+
+    index_finger_y16 = multiLandMarks[0].landmark[16].y
+    index_finger_y13 = multiLandMarks[0].landmark[13].y
+    close3 = index_finger_y16 > index_finger_y13
+
+    index_finger_y20 = multiLandMarks[0].landmark[20].y
+    index_finger_y17 = multiLandMarks[0].landmark[17].y
+    close4 = index_finger_y20 < index_finger_y17
+
+    if close1 and close2 and close3 and close4 == True:
+      break
 
     if (index_finger_x < 0.25 and score1 != 4 )and (index_finger_x < 0.25 and score != 8):
       pac = pygame.image.load("PACLOL right.png")
