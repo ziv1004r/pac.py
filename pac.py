@@ -7,6 +7,7 @@ import pygame
 import time
 import cv2 as cv
 import mediapipe as mp
+import time
 
 #basic for game
 WINDOW_W = 1300
@@ -37,8 +38,11 @@ enemy1 = pygame.transform.scale(enemy1,(30,30))
 candy_pick = pygame.image.load("candy.png")
 candy_pick = pygame.transform.scale(candy_pick,(15,15))
 #WIN-LOSE
-over = pygame.image.load("game-over.jpg")
-over = pygame.transform.scale(bk,(WINDOW_W,WINDOW_H))
+over = pygame.image.load("gamelose.png")
+over = pygame.transform.scale(over,(400, 200))
+
+won = pygame.image.load("won.png")
+won = pygame.transform.scale(won,(400,200))
 
 clock = pygame.time.Clock()
 
@@ -57,6 +61,12 @@ bot3_4_x = 65
 bot3_y = 20
 bot4_y = WINDOW_H - 50
 bot5_6_x = WINDOW_W // 2 + 20
+candy1_2x = 120
+candy1_y = 50
+candy2_y = WINDOW_H - 70
+candy3_4x = WINDOW_W - 130
+
+
 
 
 #score
@@ -76,8 +86,8 @@ def bilt():
   global pac_y, pac_x , bot1_x , bot1_2_y , bot2_x ,textsurface, textsurface1
   screen.blit(bk,(0,0))
   screen.blit(pac,(pac_x,pac_y))
-  screen.blit(textsurface,(10,20))
-  screen.blit(textsurface1,(1100,20))
+  screen.blit(textsurface,(10,250))
+  screen.blit(textsurface1,(1100,250))
 
   screen.blit(enemy1,(bot1_x,bot1_2_y))
   screen.blit(enemy1,(bot2_x,bot1_2_y))
@@ -87,6 +97,16 @@ def bilt():
 
   screen.blit(enemy1,(bot5_6_x,bot3_y))
   screen.blit(enemy1,(bot5_6_x,bot4_y))
+
+  if can1 == 0 :
+    screen.blit(candy_pick,(candy1_2x,candy1_y))
+  if can2 == 0 :
+    screen.blit(candy_pick,(candy1_2x,candy2_y))
+  if can3 == 0 :
+    screen.blit(candy_pick,(candy3_4x,candy1_y))
+  if can4 == 0 :
+    screen.blit(candy_pick,(candy3_4x,candy2_y))
+
 
 plus = 0 
 min = 0
@@ -102,17 +122,47 @@ def plusY():
   if 1200 < bot5_6_x <1230:
     bot5_6_x = WINDOW_W//2 + 20
 
+can1 = 0
+can2 = 0
+can3 = 0
+can4 = 0
+def get_candys():
+  global can1 , can2 , can3 ,can4 , score
+  if (pac_x -  candy1_2x) < 30 and ( pac_y - candy1_y) < 30 and can1 == 0 :
+    score  += 2
+    can1 = 1
+    print("yay i got")
+
+  elif (pac_x -  candy1_2x) < 30 and ( candy2_y -pac_y ) < 30 and can2 == 0:
+    score += 2
+    can2 = 2
+    print("yay i got2")
+
+  elif ( candy3_4x - pac_x ) < 30 and ( pac_y - candy1_y) < 30 and can3 == 0:
+    score += 2
+    can3 = 3
+    print("yay i got3")
+  
+  elif (candy3_4x -  pac_x) < 30 and ( candy2_y - pac_y) < 30 and can4 == 0 :
+    score += 2
+    can4 = 4
+    print("yay i got4")
 
 
 play = True
 while play:
   #blit
   myfont = pygame.font.SysFont('Comic Sans MS', 30)
-  textsurface = myfont.render('Score P:' + str(score), True, (255, 255, 0)) 
+  textsurface = myfont.render('Score P:' + str(round(score)), True, (255, 255, 0)) 
   myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
   textsurface1 = myfont.render('Score E:' + str(score1), True, (202,225,255))
   bilt()
   plusY()
+  get_candys()
+  if score1 == 4 :
+    screen.blit(over,(450, 200))
+  elif score == 8 :
+    screen.blit(won,(450,200))
 
  #color player
   #color left
@@ -163,7 +213,7 @@ while play:
     index_finger_x = multiLandMarks[0].landmark[8].x
     index_finger_y = multiLandMarks[0].landmark[8].y
 
-    if index_finger_x < 0.25:
+    if (index_finger_x < 0.25 and score1 != 4 )and (index_finger_x < 0.25 and score != 8):
       pac = pygame.image.load("PACLOL right.png")
       pac = pygame.transform.scale(pac,(30,30))
       screen.blit(pac,(pac_x,pac_y))
@@ -174,7 +224,7 @@ while play:
          pac_x = 30
 
 
-    elif index_finger_x > 0.75:
+    elif (index_finger_x > 0.75 and score1 != 4) and (index_finger_x > 0.75 and score !=8):
       pac = pygame.image.load("PACLOL left.png")
       pac = pygame.transform.scale(pac,(30,30))
       screen.blit(pac,(pac_x,pac_y))
@@ -184,14 +234,14 @@ while play:
           pac_x = 1250
 
 
-    elif index_finger_x > index_finger_y and index_finger_y < (WINDOW_H//2) :
+    elif (index_finger_x > index_finger_y and index_finger_y < (WINDOW_H//2) and score1 != 4 ) and (index_finger_x > index_finger_y and index_finger_y < (WINDOW_H//2) and score != 8) :
       pac = pygame.image.load("PACLOL top.png")
       pac = pygame.transform.scale(pac,(30,30))
       cv.putText(frame, 'up', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
       if color_top and color_top_left and color_top_right == (0,0,0,255):
         pac_y -= y_step
 
-    elif index_finger_x < index_finger_y :
+    elif (index_finger_x < index_finger_y and score1 != 4) and (index_finger_x < index_finger_y and score != 8):
       pac = pygame.image.load("PACLOLunder.png")
       pac = pygame.transform.scale(pac,(30,30))
       cv.putText(frame, 'down', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
