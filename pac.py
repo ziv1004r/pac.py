@@ -22,7 +22,8 @@ mpDraw = mp.solutions.drawing_utils
 
 #basic
 screen = pygame.display.set_mode(WINDOW_SIZE)
-pygame.display.set_caption("PAC - MAN --> made by ziv") 
+pygame.display.set_caption("PAC - MAN --> made by @itzhak.ziv ") 
+
 #BK
 bk = pygame.image.load("pacpage.png")
 bk = pygame.transform.scale(bk,(WINDOW_W,WINDOW_H))
@@ -37,6 +38,8 @@ enemy1 = pygame.transform.scale(enemy1,(30,30))
 #CANDY 
 candy_pick = pygame.image.load("candy.png")
 candy_pick = pygame.transform.scale(candy_pick,(15,15))
+
+
 #WIN-LOSE
 over = pygame.image.load("gamelose.png")
 over = pygame.transform.scale(over,(400, 200))
@@ -51,9 +54,10 @@ pac_x = WINDOW_W -585
 pac_y = WINDOW_H - 380
 x_step = 6
 y_step = 6
-pac_x_step = 15
+
 enemy1_x = WINDOW_W / 2 
 enemy1_y = WINDOW_H / 2
+
 bot1_x = 300 
 bot1_2_y = 20
 bot2_x = WINDOW_W - 310
@@ -61,6 +65,7 @@ bot3_4_x = 65
 bot3_y = 20
 bot4_y = WINDOW_H - 50
 bot5_6_x = WINDOW_W // 2 + 20
+
 candy1_2x = 120
 candy1_y = 50
 candy2_y = WINDOW_H - 70
@@ -69,12 +74,12 @@ candy3_4x = WINDOW_W - 130
 
 
 
-#score
+#score for player
 score = 0
 myfont = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface = myfont.render('Score P:' + str(score), True, (255, 255, 0))
 
-#score1
+#score1 for enemy
 score1 = 0
 myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
 textsurface1 = myfont.render('Score E:' + str(score1), True, (202,225,255))
@@ -88,6 +93,7 @@ def bilt():
   screen.blit(pac,(pac_x,pac_y))
   screen.blit(textsurface,(10,250))
   screen.blit(textsurface1,(1100,250))
+  screen.blit(textsurface2,(590,200))
 
   screen.blit(enemy1,(bot1_x,bot1_2_y))
   screen.blit(enemy1,(bot2_x,bot1_2_y))
@@ -107,14 +113,15 @@ def bilt():
   if can4 == 0 :
     screen.blit(candy_pick,(candy3_4x,candy2_y))
 
-
+bot_step = 4
 plus = 0 
 min = 0
 def plusY():
-  global min , plus , bot1_2_y , bot3_4_x , bot5_6_x
-  bot1_2_y += 6
-  bot3_4_x += 6
-  bot5_6_x += 6
+  #bot way
+  global min , plus , bot1_2_y , bot3_4_x , bot5_6_x , bot_step
+  bot1_2_y += bot_step
+  bot3_4_x += bot_step
+  bot5_6_x += bot_step
   if   370< bot1_2_y >400:
     bot1_2_y = 20
   if 600 < bot3_4_x <(WINDOW_W//2 - 30 ):
@@ -126,7 +133,9 @@ can1 = 0
 can2 = 0
 can3 = 0
 can4 = 0
+
 def get_candys():
+  # get candy or nah
   global can1 , can2 , can3 ,can4 , score
   if (pac_x -  candy1_2x) < 30 and ( pac_y - candy1_y) < 30 and can1 == 0 :
     score  += 2
@@ -148,7 +157,7 @@ def get_candys():
     can4 = 4
     print("yay i got4")
 
-
+level = 1
 play = True
 while play:
   #blit
@@ -156,10 +165,21 @@ while play:
   textsurface = myfont.render('Score P:' + str(round(score)), True, (255, 255, 0)) 
   myfont1 = pygame.font.SysFont('Comic Sans MS', 30)
   textsurface1 = myfont.render('Score E:' + str(score1), True, (202,225,255))
+  myfont2 = pygame.font.SysFont('Comic Sans MS', 30)
+  textsurface2 = myfont.render('LEVEL:' + str(level), True, (255,225,255))
   bilt()
+
+  #calling def
   plusY()
   get_candys()
-  if score1 == 4 :
+
+  #close the window
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+      play = False
+
+  #who won
+  if score1 == 6 :
     screen.blit(over,(450, 200))
   elif score == 8 :
     screen.blit(won,(450,200))
@@ -217,7 +237,7 @@ while play:
 
     index_finger_y12 = multiLandMarks[0].landmark[12].y
     index_finger_y9 = multiLandMarks[0].landmark[9].y
-    close2 = index_finger_y12 > index_finger_y9
+    close2 = index_finger_y12 < index_finger_y9
 
     index_finger_y16 = multiLandMarks[0].landmark[16].y
     index_finger_y13 = multiLandMarks[0].landmark[13].y
@@ -227,10 +247,30 @@ while play:
     index_finger_y17 = multiLandMarks[0].landmark[17].y
     close4 = index_finger_y20 < index_finger_y17
 
-    if close1 and close2 and close3 and close4 == True:
-      break
+    if (close1 and close2 and close3 and close4 == True) and (score1 == 6):
+      score = 0 
+      score1 = 0
+      level = 1
+      pac_x = WINDOW_W -585
+      pac_y = WINDOW_H - 380
+      can1 = 0
+      can2 = 0
+      can3 = 0
+      can4 = 0 
+      bot_step = 4
 
-    if (index_finger_x < 0.25 and score1 != 4 )and (index_finger_x < 0.25 and score != 8):
+    elif (close1 and close2 and close3 and close4 == True) and (score == 8):
+      pac_x = WINDOW_W -585
+      pac_y = WINDOW_H - 380
+      level += 1
+      can1 = 0
+      can2 = 0
+      can3 = 0
+      can4 = 0
+      score = 0
+      bot_step += 2
+
+    if (index_finger_x < 0.25 and score1 != 6 )and (index_finger_x < 0.25 and score != 8):
       pac = pygame.image.load("PACLOL right.png")
       pac = pygame.transform.scale(pac,(30,30))
       screen.blit(pac,(pac_x,pac_y))
@@ -241,7 +281,7 @@ while play:
          pac_x = 30
 
 
-    elif (index_finger_x > 0.75 and score1 != 4) and (index_finger_x > 0.75 and score !=8):
+    elif (index_finger_x > 0.75 and score1 != 6) and (index_finger_x > 0.75 and score !=8):
       pac = pygame.image.load("PACLOL left.png")
       pac = pygame.transform.scale(pac,(30,30))
       screen.blit(pac,(pac_x,pac_y))
@@ -251,14 +291,14 @@ while play:
           pac_x = 1250
 
 
-    elif (index_finger_x > index_finger_y and index_finger_y < (WINDOW_H//2) and score1 != 4 ) and (index_finger_x > index_finger_y and index_finger_y < (WINDOW_H//2) and score != 8) :
+    elif (0.5 > index_finger_y and score1 != 6 ) and (0.5 > index_finger_y and score != 8) :
       pac = pygame.image.load("PACLOL top.png")
       pac = pygame.transform.scale(pac,(30,30))
       cv.putText(frame, 'up', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
       if color_top and color_top_left and color_top_right == (0,0,0,255):
         pac_y -= y_step
 
-    elif (index_finger_x < index_finger_y and score1 != 4) and (index_finger_x < index_finger_y and score != 8):
+    elif (0.5< index_finger_y and score1 != 6) and (0.5 < index_finger_y and score != 8):
       pac = pygame.image.load("PACLOLunder.png")
       pac = pygame.transform.scale(pac,(30,30))
       cv.putText(frame, 'down', (100,100),cv.FONT_HERSHEY_SIMPLEX,3, (255, 0, 0), 2 , cv.LINE_AA)
@@ -277,10 +317,7 @@ while play:
     break
   
 
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      play = False
-
+  
   pygame.display.flip()
 cap.release()
 cv.destroyAllWindows()
