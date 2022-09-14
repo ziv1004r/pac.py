@@ -89,9 +89,9 @@ def bilt():
   global pac_y, pac_x , bot1_x , bot1_2_y , bot2_x ,textsurface, textsurface1
   screen.blit(bk,(0,0))
   screen.blit(pac,(pac_x,pac_y))
-  screen.blit(textsurface,(10,250))
-  screen.blit(textsurface_ene,(1100,250))
-  screen.blit(textsurface2,(590,200))
+  screen.blit(textsurface,(10,240))
+  screen.blit(textsurface_ene,(1100,240))
+  screen.blit(textsurface2,(590,190))
 
   screen.blit(enemy1,(bot1_x,bot1_2_y))
   screen.blit(enemy1,(bot2_x,bot1_2_y))
