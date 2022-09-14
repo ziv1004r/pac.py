@@ -1,7 +1,7 @@
 from ast import If
 from calendar import c
 from tkinter.tix import IMAGE
-from turtle import color, left, right
+from turtle import color, delay, left, right
 from winsound import PlaySound
 import pygame
 import time
@@ -111,7 +111,7 @@ def bilt():
   if take4 == 0 :
     screen.blit(candy_pick,(candy3_4x,candy2_y))
 
-bot_step = 6
+bot_step = 8
 plus = 0 
 min = 0
 def plusY():
@@ -177,8 +177,10 @@ while play:
   #who won
   if score_ene == 6 :
     screen.blit(over,(450, 200))
+    pygame.time.wait(5000)
   elif score == 8 :
     screen.blit(won,(450,200))
+    pygame.time.wait(5000)
 
  #color player
   #color left
@@ -243,7 +245,7 @@ while play:
     index_finger_y17 = multiLandMarks[0].landmark[17].y
     close4 = index_finger_y20 < index_finger_y17
 
-    if (close1 and close2 and close3 and close4 == True) and (score_ene == 6):
+    if (score_ene == 6):
       score = 0 
       score_ene = 0
       level = 1
@@ -253,9 +255,9 @@ while play:
       take2 = 0
       take3 = 0
       take4 = 0 
-      bot_step = 4
+      bot_step = 7
 
-    elif (close1 and close2 and close3 and close4 == True) and (score == 8):
+    elif (score == 8):
       pac_x = WINDOW_W -585
       pac_y = WINDOW_H - 380
       level += 1
