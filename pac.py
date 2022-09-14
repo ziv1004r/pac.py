@@ -111,7 +111,7 @@ def bilt():
   if take4 == 0 :
     screen.blit(candy_pick,(candy3_4x,candy2_y))
 
-bot_step = 4
+bot_step = 6
 plus = 0 
 min = 0
 def plusY():
